@@ -24,6 +24,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Live AI Hosting Workflow
+
+1.  **Configure API Keys:** Add your OpenAI and Google API keys in the Settings page.
+2.  **Enable Voice Features:** Toggle the "Enable AI Voice Output" setting to allow the AI to speak.
+3.  **Prepare a Lecture:** Upload your notes or enter a topic on the Lecture Preparation page. Leo AI will generate a structured lecture script.
+4.  **Create a Meeting:** Schedule a Google Meet session and link your prepared lecture.
+5.  **Start the Lecture:** Join the meeting and start the live lecture. The AI will deliver the content, respond to spoken questions, and resume the lecture automatically.
+
 ## Features
 
 -   **Dashboard:** View key statistics and recent activity at a glance.

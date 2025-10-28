@@ -6,11 +6,24 @@ import Sidebar from '@/components/Sidebar';
 import AIResponseBox from '@/components/AIResponseBox';
 
 const LecturePreparationPage = () => {
-  const [summary, setSummary] = useState('');
+  const [lectureContent, setLectureContent] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // TODO: Handle file upload and call API to generate summary
-    setSummary('This is a placeholder summary of the uploaded document.');
+  const handleGenerateLecture = async (input: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/openai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'generateLecture', payload: { input } }),
+      });
+      const content = await response.json();
+      setLectureContent(content);
+    } catch (error) {
+      console.error('Failed to generate lecture content:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const saveLecture = () => {
@@ -29,18 +42,26 @@ const LecturePreparationPage = () => {
             <h2 className="text-xl font-bold mb-4">Upload Your Materials</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="flex flex-col items-center justify-center p-6 bg-primary rounded-lg">
-                <input type="file" onChange={handleFileUpload} className="mb-4" />
+                <input type="file" className="mb-4" />
                 <p className="text-center text-gray-400">Upload PDF or Audio</p>
               </div>
               <div className="col-span-2">
                 <textarea
+                  id="lecture-input"
                   className="w-full h-32 p-4 bg-primary rounded-lg text-white"
                   placeholder="Or type a prompt..."
                 ></textarea>
+                <button
+                  onClick={() => handleGenerateLecture((document.getElementById('lecture-input') as HTMLTextAreaElement).value)}
+                  className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Generating...' : 'Generate Lecture'}
+                </button>
               </div>
             </div>
           </div>
-          {summary && (
+          {lectureContent && (
             <div className="mt-8">
               <AIResponseBox />
               <button

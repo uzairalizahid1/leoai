@@ -11,6 +11,7 @@ const SettingsPage = () => {
     openaiApiKey: '',
     enableRealTimeQA: true,
     autoSummarize: false,
+    enableVoiceOutput: true,
   });
 
   useEffect(() => {
@@ -85,13 +86,24 @@ const SettingsPage = () => {
                 className="form-checkbox h-5 w-5 text-blue-600"
               />
             </div>
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-4">
               <label htmlFor="autoSummarize" className="text-gray-400">Auto Summarize Lectures</label>
               <input
                 type="checkbox"
                 id="autoSummarize"
                 name="autoSummarize"
                 checked={settings.autoSummarize}
+                onChange={handleInputChange}
+                className="form-checkbox h-5 w-5 text-blue-600"
+              />
+            </div>
+            <div className="flex items-center justify-between mb-8">
+              <label htmlFor="enableVoiceOutput" className="text-gray-400">Enable AI Voice Output</label>
+              <input
+                type="checkbox"
+                id="enableVoiceOutput"
+                name="enableVoiceOutput"
+                checked={settings.enableVoiceOutput}
                 onChange={handleInputChange}
                 className="form-checkbox h-5 w-5 text-blue-600"
               />

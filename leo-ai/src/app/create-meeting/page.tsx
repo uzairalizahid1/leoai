@@ -11,17 +11,23 @@ const CreateMeetingPage = () => {
     platform: 'Google Meet',
     lectureId: '',
   });
+  const [meetingLink, setMeetingLink] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setMeetingInfo(prev => ({ ...prev, [name]: value }));
   };
 
-  const scheduleMeeting = (e: React.FormEvent) => {
+  const scheduleMeeting = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement logic to save meeting info and generate meeting link
+    const response = await fetch('/api/meet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: meetingInfo.title, dateTime: meetingInfo.dateTime }),
+    });
+    const data = await response.json();
+    setMeetingLink(data.meetingLink);
     alert(`Meeting "${meetingInfo.title}" scheduled successfully!`);
-    console.log(meetingInfo);
   };
 
   return (
@@ -32,6 +38,7 @@ const CreateMeetingPage = () => {
         <div className="mt-8">
           <h1 className="text-3xl font-bold mb-6">Create New Meeting</h1>
           <form onSubmit={scheduleMeeting} className="bg-secondary rounded-lg p-8 shadow-md max-w-2xl mx-auto">
+            {/* Form inputs remain the same */}
             <div className="mb-6">
               <label htmlFor="title" className="block text-gray-400 font-medium mb-2">Meeting Title</label>
               <input
@@ -91,6 +98,12 @@ const CreateMeetingPage = () => {
               Schedule & Launch Meeting
             </button>
           </form>
+          {meetingLink && (
+            <div className="mt-8 text-center">
+              <p className="text-lg">Meeting Link:</p>
+              <a href={meetingLink} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">{meetingLink}</a>
+            </div>
+          )}
         </div>
       </main>
     </div>
