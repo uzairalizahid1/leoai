@@ -24,6 +24,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Features
+
+-   **Dashboard:** View key statistics and recent activity at a glance.
+-   **Lecture Preparation:** Upload materials (PDF, audio, or text prompts) to automatically generate lecture notes and summaries.
+-   **Create Meeting:** Schedule meetings on Google Meet or Zoom and link them to prepared lectures.
+-   **Analytics:** Visualize student engagement and meeting data with interactive charts.
+-   **Settings:** Configure API keys and application preferences.
+
 ## Future Features
 
 -   [ ] User authentication with NextAuth

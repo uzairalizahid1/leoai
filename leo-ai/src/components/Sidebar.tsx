@@ -8,6 +8,8 @@ const Sidebar = () => {
         <ul>
           <li className="mb-2"><a href="/dashboard" className="hover:text-gray-300">Dashboard</a></li>
           <li className="mb-2"><a href="/lectures" className="hover:text-gray-300">Lectures</a></li>
+          <li className="mb-2"><a href="/lecture-preparation" className="hover:text-gray-300">Lecture Prep</a></li>
+          <li className="mb-2"><a href="/create-meeting" className="hover:text-gray-300">Create Meeting</a></li>
           <li className="mb-2"><a href="/analytics" className="hover:text-gray-300">Analytics</a></li>
           <li className="mb-2"><a href="/settings" className="hover:text-gray-300">Settings</a></li>
         </ul>
