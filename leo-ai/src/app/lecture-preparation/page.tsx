@@ -4,10 +4,13 @@ import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import AIResponseBox from '@/components/AIResponseBox';
+import { supabase } from '@/lib/supabaseClient';
+import { toast } from 'react-hot-toast';
 
 const LecturePreparationPage = () => {
   const [lectureContent, setLectureContent] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [title, setTitle] = useState('');
 
   const handleGenerateLecture = async (input: string) => {
     setIsLoading(true);
@@ -21,14 +24,26 @@ const LecturePreparationPage = () => {
       setLectureContent(content);
     } catch (error) {
       console.error('Failed to generate lecture content:', error);
+      toast.error('Failed to generate lecture content.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const saveLecture = () => {
-    // TODO: Implement logic to save the lecture to the database
-    alert('Lecture saved!');
+  const saveLecture = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user && lectureContent) {
+      const { error } = await supabase.from('lectures').insert({
+        user_id: user.id,
+        title,
+        content: lectureContent,
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Lecture saved successfully!');
+      }
+    }
   };
 
   return (
@@ -46,6 +61,14 @@ const LecturePreparationPage = () => {
                 <p className="text-center text-gray-400">Upload PDF or Audio</p>
               </div>
               <div className="col-span-2">
+                <input
+                  type="text"
+                  placeholder="Lecture Title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full px-4 py-2 mb-4 text-white bg-primary rounded-md"
+                  required
+                />
                 <textarea
                   id="lecture-input"
                   className="w-full h-32 p-4 bg-primary rounded-lg text-white"

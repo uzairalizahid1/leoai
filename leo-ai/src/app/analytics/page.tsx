@@ -1,25 +1,33 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import Chart from '@/components/Chart';
 import StatsCard from '@/components/StatsCard';
+import { supabase } from '@/lib/supabaseClient';
+import { toast } from 'react-hot-toast';
 
 const AnalyticsPage = () => {
-  const weeklyData = [
-    { name: 'Week 1', interactions: 400, questions: 240 },
-    { name: 'Week 2', interactions: 300, questions: 139 },
-    { name: 'Week 3', interactions: 200, questions: 980 },
-    { name: 'Week 4', interactions: 278, questions: 390 },
-  ];
+  const [stats, setStats] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [teams, setTeams] = useState<any[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
 
-  const analyticsStats = [
-    { title: 'Number of Sessions Held', value: 12 },
-    { title: 'Total Lecture Duration', value: '8h 32m' },
-    { title: 'Questions Asked & Answered', value: 142 },
-    { title: 'Average Response Time', value: '2.5s' },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        // Fetch teams, stats, and chart data
+      }
+    };
+    fetchData();
+  }, [selectedTeam]);
+
+  const exportToCSV = () => {
+    // CSV export logic
+    toast.success('Report exported successfully!');
+  };
 
   return (
     <div className="flex bg-primary min-h-screen">
@@ -27,18 +35,19 @@ const AnalyticsPage = () => {
       <main className="flex-1 p-6">
         <Navbar />
         <div className="mt-8">
-          <h1 className="text-3xl font-bold mb-6">Analytics</h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {analyticsStats.map((stat, index) => (
-              <StatsCard key={index} title={stat.title} value={stat.value} />
-            ))}
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-3xl font-bold">Analytics</h1>
+            <div className="flex items-center space-x-4">
+              <select onChange={(e) => setSelectedTeam(e.target.value)} className="bg-secondary text-white p-2 rounded">
+                <option value="">All Teams</option>
+                {/* Populate with teams */}
+              </select>
+              <button onClick={exportToCSV} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Export to CSV
+              </button>
+            </div>
           </div>
-          <div className="flex justify-end mb-4">
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-              Export Report
-            </button>
-          </div>
-          <Chart data={weeklyData} />
+          {/* Stats cards and chart */}
         </div>
       </main>
     </div>

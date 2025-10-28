@@ -3,10 +3,26 @@
 import React, { useState, useEffect } from 'react';
 import { Toaster, toast } from 'react-hot-toast';
 import { startLecture, handleUserQuestion } from '@/lib/aiMeetingEngine';
+import { useUserRole } from '@/app/hooks/useUserRole';
+import { supabase } from '@/lib/supabaseClient';
 
 const MeetingViewPage = ({ params }: { params: { id: string } }) => {
   const [isAISpeaking, setIsAISpeaking] = useState(false);
   const [lectureStarted, setLectureStarted] = useState(false);
+  const [meeting, setMeeting] = useState<any>(null);
+  const role = useUserRole(meeting?.team_id);
+
+  useEffect(() => {
+    const fetchMeeting = async () => {
+      const { data, error } = await supabase.from('meetings').select('*').eq('id', params.id).single();
+      if (error) {
+        toast.error('Failed to fetch meeting data.');
+      } else {
+        setMeeting(data);
+      }
+    };
+    fetchMeeting();
+  }, [params.id]);
 
   const beginLecture = () => {
     setLectureStarted(true);
@@ -20,7 +36,7 @@ const MeetingViewPage = ({ params }: { params: { id: string } }) => {
     toast('Listening for your question...');
     // Placeholder for lecture context
     const lectureContext = 'The current topic is quantum entanglement.';
-    handleUserQuestion(lectureContext);
+    handleUserQuestion(lectureContext, params.id);
   };
 
   useEffect(() => {
@@ -37,7 +53,7 @@ const MeetingViewPage = ({ params }: { params: { id: string } }) => {
     <div className="flex flex-col bg-primary min-h-screen text-white p-6">
       <Toaster />
       <header className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Live Lecture: {params.id}</h1>
+        <h1 className="text-3xl font-bold">Live Lecture: {meeting?.title}</h1>
         {isAISpeaking && <div className="text-lg text-blue-400">AI is speaking...</div>}
       </header>
       <main className="flex-1 bg-secondary rounded-lg p-6 shadow-md">
@@ -45,7 +61,7 @@ const MeetingViewPage = ({ params }: { params: { id: string } }) => {
         <p>Lecture content will be displayed here...</p>
       </main>
       <footer className="mt-6 flex justify-center gap-4">
-        {!lectureStarted && (
+        {!lectureStarted && (role === 'Owner' || role === 'Co-Host') && (
           <button
             onClick={beginLecture}
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"

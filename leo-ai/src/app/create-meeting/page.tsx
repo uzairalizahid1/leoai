@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
+import { supabase } from '@/lib/supabaseClient';
+import { toast } from 'react-hot-toast';
 
 const CreateMeetingPage = () => {
   const [meetingInfo, setMeetingInfo] = useState({
@@ -12,6 +14,22 @@ const CreateMeetingPage = () => {
     lectureId: '',
   });
   const [meetingLink, setMeetingLink] = useState('');
+  const [lectures, setLectures] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchLectures = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase.from('lectures').select('*').eq('user_id', user.id);
+        if (error) {
+          toast.error(error.message);
+        } else {
+          setLectures(data);
+        }
+      }
+    };
+    fetchLectures();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -20,14 +38,30 @@ const CreateMeetingPage = () => {
 
   const scheduleMeeting = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await fetch('/api/meet', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: meetingInfo.title, dateTime: meetingInfo.dateTime }),
-    });
-    const data = await response.json();
-    setMeetingLink(data.meetingLink);
-    alert(`Meeting "${meetingInfo.title}" scheduled successfully!`);
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const response = await fetch('/api/meet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: meetingInfo.title, dateTime: meetingInfo.dateTime }),
+      });
+      const data = await response.json();
+      setMeetingLink(data.meetingLink);
+
+      const { error } = await supabase.from('meetings').insert({
+        user_id: user.id,
+        lecture_id: meetingInfo.lectureId || null,
+        meet_link: data.meetingLink,
+        date_time: meetingInfo.dateTime,
+        status: 'scheduled',
+      });
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success(`Meeting "${meetingInfo.title}" scheduled successfully!`);
+      }
+    }
   };
 
   return (
@@ -86,9 +120,9 @@ const CreateMeetingPage = () => {
                 className="w-full bg-primary text-white p-3 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select a lecture</option>
-                {/* TODO: Populate with actual lectures from DB */}
-                <option value="1">Lecture on Quantum Physics</option>
-                <option value="2">History of Ancient Rome</option>
+                {lectures.map(lecture => (
+                  <option key={lecture.id} value={lecture.id}>{lecture.title}</option>
+                ))}
               </select>
             </div>
             <button

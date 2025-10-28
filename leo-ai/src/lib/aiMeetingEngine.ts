@@ -4,6 +4,7 @@
  */
 
 import { textToSpeech, speechToText } from './voiceEngine';
+import { supabase } from './supabaseClient';
 
 /**
  * Starts the AI-powered lecture.
@@ -39,8 +40,9 @@ export const startLecture = async (lectureInput: string) => {
 /**
  * Handles a user's question during a lecture.
  * @param {string} lectureContext - The context of the lecture for the AI.
+ * @param {string} meetingId - The ID of the current meeting.
  */
-export const handleUserQuestion = async (lectureContext: string) => {
+export const handleUserQuestion = async (lectureContext: string, meetingId: string) => {
   try {
     // Convert user's speech to text
     const userQuestion = await speechToText();
@@ -60,6 +62,13 @@ export const handleUserQuestion = async (lectureContext: string) => {
 
       // Speak the AI's response
       textToSpeech(aiResponse.response);
+
+      // Save to database
+      await supabase.from('questions').insert({
+        meeting_id: meetingId,
+        question_text: userQuestion,
+        ai_response: aiResponse.response,
+      });
     }
   } catch (error) {
     console.error('An error occurred while handling the question:', error);
