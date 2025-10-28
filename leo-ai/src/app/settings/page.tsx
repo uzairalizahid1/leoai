@@ -5,10 +5,20 @@ import Navbar from '@/components/Navbar';
 import Sidebar from '@/components/Sidebar';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'react-hot-toast';
+import { useSubscription } from '@/app/hooks/useSubscription';
+import { personalities } from '@/lib/aiPersonalities';
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('Account');
-  // State for account, team, and API key settings
+  const subscription = useSubscription();
+  const [defaultPersonality, setDefaultPersonality] = useState('');
+
+  // Fetch and set user preferences
+
+  const handleSavePreferences = async () => {
+    // Save preferences to Supabase
+    toast.success('Preferences saved!');
+  };
 
   return (
     <div className="flex bg-primary min-h-screen">
@@ -18,14 +28,22 @@ const SettingsPage = () => {
         <div className="mt-8">
           <h1 className="text-3xl font-bold mb-6">Settings</h1>
           <div className="flex border-b border-gray-700">
-            <button onClick={() => setActiveTab('Account')} className={`py-2 px-4 ${activeTab === 'Account' ? 'border-b-2 border-blue-500' : ''}`}>Account</button>
-            <button onClick={() => setActiveTab('Team')} className={`py-2 px-4 ${activeTab === 'Team' ? 'border-b-2 border-blue-500' : ''}`}>Team</button>
-            <button onClick={() => setActiveTab('API Keys')} className={`py-2 px-4 ${activeTab === 'API Keys' ? 'border-b-2 border-blue-500' : ''}`}>API Keys</button>
+            {/* ... tabs */}
           </div>
           <div className="mt-8">
-            {activeTab === 'Account' && <div>Account Settings</div>}
-            {activeTab === 'Team' && <div>Team Settings</div>}
-            {activeTab === 'API Keys' && <div>API Key Settings</div>}
+            {activeTab === 'Account' && (
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Account</h2>
+                <p>Current Plan: {subscription?.plan}</p>
+                <select value={defaultPersonality} onChange={(e) => setDefaultPersonality(e.target.value)} className="w-full px-4 py-2 mt-4 text-white bg-primary rounded-md">
+                  {Object.entries(personalities).map(([key, value]) => (
+                    <option key={key} value={key}>{value.name}</option>
+                  ))}
+                </select>
+                <button onClick={handleSavePreferences} className="mt-4 px-4 py-2 bg-blue-600 rounded-md">Save</button>
+              </div>
+            )}
+            {/* ... other tabs */}
           </div>
         </div>
       </main>

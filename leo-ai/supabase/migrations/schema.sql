@@ -4,7 +4,20 @@ CREATE TABLE users (
     name VARCHAR(255),
     email VARCHAR(255) UNIQUE NOT NULL,
     avatar_url VARCHAR(255),
+    role VARCHAR(50) DEFAULT 'user' NOT NULL, -- user, admin
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Subscriptions Table
+CREATE TABLE subscriptions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id) NOT NULL,
+    plan VARCHAR(50) NOT NULL, -- Free, Pro, Enterprise
+    status VARCHAR(50) NOT NULL, -- active, canceled, trialing
+    stripe_customer_id VARCHAR(255),
+    stripe_subscription_id VARCHAR(255),
+    start_date TIMESTAMP WITH TIME ZONE,
+    end_date TIMESTAMP WITH TIME ZONE
 );
 
 -- Teams Table

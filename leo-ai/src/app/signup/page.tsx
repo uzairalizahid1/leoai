@@ -14,6 +14,15 @@ const SignupPage = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: email,
+          subject: 'Welcome to Leo AI!',
+          html: '<h1>Welcome!</h1><p>Thanks for signing up for Leo AI.</p>',
+        }),
+      });
       toast.success('Signed up successfully! Please check your email to verify your account.');
     }
   };
